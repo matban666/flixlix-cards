@@ -6,6 +6,7 @@ import { individualLeftBottomElement } from "@flixlix-cards/shared/components/in
 import { individualLeftTopElement } from "@flixlix-cards/shared/components/individual-left-top-element";
 import { individualRightBottomElement } from "@flixlix-cards/shared/components/individual-right-bottom-element";
 import { individualRightTopElement } from "@flixlix-cards/shared/components/individual-right-top-element";
+import { tertiaryTemplateKey } from "@flixlix-cards/shared/components/misc/bubble-icon";
 import { dashboardLinkElement } from "@flixlix-cards/shared/components/misc/dashboard-link";
 import { nonFossilElement } from "@flixlix-cards/shared/components/non-fossil";
 import { solarElement } from "@flixlix-cards/shared/components/solar";
@@ -471,7 +472,9 @@ export class PowerFlowCardPlus extends LitElement {
           ${battery.has || checkHasBottomIndividual(individualObjs)
             ? html`<div class="row">
                 ${spacer}
-                ${battery.has ? batteryElement(this, this._config, { battery, entities }) : spacer}
+                ${battery.has
+                  ? batteryElement(this, this._config, { battery, entities, templatesObj })
+                  : spacer}
                 ${individualFieldLeftBottom
                   ? individualLeftBottomElement(this, this._config, {
                       displayState: getIndividualDisplayState(individualFieldLeftBottom),
@@ -991,6 +994,12 @@ export class PowerFlowCardPlus extends LitElement {
         individualObjs?.map(
           (_, index) => this._templateResults[`${individualKeys[index]}Secondary`]?.result
         ) || [],
+      tertiary: Object.fromEntries(
+        this._tertiaryTemplateTopics().map(({ topic }) => [
+          topic,
+          this._templateResults[topic]?.result,
+        ])
+      ),
     };
 
     const isCardWideEnough = this._width > 420;
@@ -1085,6 +1094,31 @@ export class PowerFlowCardPlus extends LitElement {
         }
       }
     }
+    for (const { topic, template } of this._tertiaryTemplateTopics()) {
+      this._tryConnect(template, topic);
+    }
+  }
+
+  private _tertiaryTemplateTopics(): { topic: string; template: string }[] {
+    const { entities } = this._config;
+    const topics: { topic: string; template: string | undefined }[] = [
+      { topic: tertiaryTemplateKey("grid"), template: entities.grid?.tertiary_info?.template },
+      { topic: tertiaryTemplateKey("solar"), template: entities.solar?.tertiary_info?.template },
+      {
+        topic: tertiaryTemplateKey("battery"),
+        template: entities.battery?.tertiary_info?.template,
+      },
+      { topic: tertiaryTemplateKey("home"), template: entities.home?.tertiary_info?.template },
+      {
+        topic: tertiaryTemplateKey("nonFossilFuel"),
+        template: entities.fossil_fuel_percentage?.tertiary_info?.template,
+      },
+      ...(entities.individual ?? []).map((individual) => ({
+        topic: tertiaryTemplateKey({ individual: individual.entity }),
+        template: individual.tertiary_info?.template,
+      })),
+    ];
+    return topics.filter((t): t is { topic: string; template: string } => !!t.template);
   }
 
   private async _tryConnect(inputTemplate: string, topic: string): Promise<void> {

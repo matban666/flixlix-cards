@@ -223,6 +223,36 @@ export const styles = css`
   ha-icon.small {
     --mdc-icon-size: 12px;
   }
+  ha-svg-icon.bubble-icon {
+    display: inline;
+    padding-bottom: 2px;
+  }
+  .battery-icon-actions {
+    display: contents;
+  }
+  .icon-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .icon-container > ha-icon,
+  .icon-container > ha-svg-icon {
+    padding-bottom: 0;
+  }
+  .icon-container > .tertiary-info {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    font-size: var(--tertiary-info-font-size, 8px);
+    line-height: 1;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--tertiary-info-color, var(--primary-text-color));
+  }
   .label {
     color: var(--secondary-text-color);
     font-size: 12px;
@@ -381,7 +411,8 @@ export const styles = css`
   .low-carbon .circle {
     border-color: var(--non-fossil-color);
   }
-  .low-carbon ha-icon:not(.small) {
+  .low-carbon ha-icon:not(.small),
+  .low-carbon ha-svg-icon.bubble-icon {
     color: var(--icon-non-fossil-color);
   }
   circle.low-carbon {
@@ -395,7 +426,8 @@ export const styles = css`
   .solar .circle {
     border-color: var(--energy-solar-color);
   }
-  .solar ha-icon:not(.small) {
+  .solar ha-icon:not(.small),
+  .solar ha-svg-icon.bubble-icon {
     color: var(--icon-solar-color);
   }
   circle.solar,
@@ -447,7 +479,8 @@ export const styles = css`
   path.battery-to-grid {
     stroke: var(--battery-grid-line);
   }
-  .battery ha-icon:not(.small) {
+  .battery ha-icon:not(.small),
+  .battery ha-svg-icon.bubble-icon {
     color: var(--icon-battery-color);
   }
 
@@ -486,7 +519,8 @@ export const styles = css`
     stroke-width: 4;
     fill: var(--energy-grid-consumption-color);
   }
-  .grid ha-icon:not(.small) {
+  .grid ha-icon:not(.small),
+  .grid ha-svg-icon.bubble-icon {
     color: var(--icon-grid-color);
   }
   .home .circle {
@@ -496,7 +530,8 @@ export const styles = css`
   .home .circle.border {
     border-width: 2px;
   }
-  .home ha-icon:not(.small) {
+  .home ha-icon:not(.small),
+  .home ha-svg-icon.bubble-icon {
     color: var(--icon-home-color);
   }
   .circle svg circle {

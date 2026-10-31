@@ -6,6 +6,7 @@ import {
 } from "@flixlix-cards/shared/types";
 import { displayValue } from "@flixlix-cards/shared/utils/display-value";
 import { html, nothing } from "lit";
+import { bubbleIcon, tertiaryTemplateKey } from "./misc/bubble-icon";
 import { generalSecondarySpan } from "./spans/general-secondary-span";
 
 export const gridElement = (
@@ -76,7 +77,14 @@ export const gridElement = (
     >
       <ha-ripple .disabled=${disableEntityClick}></ha-ripple>
       ${generalSecondarySpan(main.hass, main, config, templatesObj, grid, "grid")}
-      ${grid.icon !== " " ? html` <ha-icon id="grid-icon" .icon=${grid.icon}></ha-icon>` : nothing}
+      ${bubbleIcon({
+        main,
+        id: "grid-icon",
+        icon: grid.icon,
+        fieldConfig: entities.grid,
+        tertiaryTemplate: templatesObj.tertiary?.[tertiaryTemplateKey("grid")],
+        allowIconPath: !grid.powerOutage?.isOutage,
+      })}
       ${(entities.grid?.display_state === "two_way" ||
         entities.grid?.display_state === undefined ||
         (entities.grid?.display_state === "one_way_no_zero" && (grid.state.toGrid ?? 0) > 0) ||

@@ -63,6 +63,10 @@ export interface BaseConfigEntity extends ActionConfigSet {
   unit_white_space?: boolean;
   use_metadata?: boolean;
   secondary_info?: SecondaryInfoType;
+  /** SVG path data (24x24 viewBox) drawn instead of `icon`. */
+  icon_path?: string;
+  /** Metric shown in the centre of the bubble's icon. Same options as secondary_info. */
+  tertiary_info?: SecondaryInfoType;
   invert_state?: boolean;
 }
 
@@ -104,6 +108,8 @@ export type TemplatesObj = {
   homeSecondary: string | undefined;
   individual: (string | undefined)[];
   nonFossilFuelSecondary: string | undefined;
+  /** tertiary_info template results, keyed by tertiaryTemplateKey(). */
+  tertiary?: Record<string, string | undefined>;
 };
 
 export type HomeSources = {

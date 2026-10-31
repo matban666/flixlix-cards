@@ -8,6 +8,7 @@ import {
 import { displayValue } from "@flixlix-cards/shared/utils/display-value";
 import { isNumberValue } from "@flixlix-cards/shared/utils/utils";
 import { html, nothing } from "lit";
+import { bubbleIcon, tertiaryTemplateKey } from "./misc/bubble-icon";
 import { generalSecondarySpan } from "./spans/general-secondary-span";
 
 export const solarElement = (
@@ -75,9 +76,13 @@ export const solarElement = (
       ${shouldShowSecondary()
         ? generalSecondarySpan(main.hass, main, config, templatesObj, solar, "solar")
         : nothing}
-      ${solar.icon !== " "
-        ? html` <ha-icon id="solar-icon" .icon=${solar.icon}></ha-icon>`
-        : nothing}
+      ${bubbleIcon({
+        main,
+        id: "solar-icon",
+        icon: solar.icon,
+        fieldConfig: entities.solar,
+        tertiaryTemplate: templatesObj.tertiary?.[tertiaryTemplateKey("solar")],
+      })}
       ${entities.solar?.display_zero_state !== false || (bottomSolarState || 0) > 0
         ? html` <span class="solar">
             ${displayValue(main.hass, config, bottomSolarState, {

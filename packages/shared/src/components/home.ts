@@ -7,6 +7,7 @@ import {
   type TemplatesObj,
 } from "@flixlix-cards/shared/types";
 import { html, nothing, svg } from "lit";
+import { bubbleIcon, tertiaryTemplateKey } from "./misc/bubble-icon";
 import { generalSecondarySpan } from "./spans/general-secondary-span";
 
 interface Home {
@@ -78,7 +79,13 @@ export const homeElement = (
       >
         <ha-ripple .disabled=${disableEntityClick}></ha-ripple>
         ${generalSecondarySpan(main.hass, main, config, templatesObj, home, "home")}
-        ${home.icon !== " " ? html`<ha-icon id="home-icon" .icon=${home.icon}></ha-icon>` : nothing}
+        ${bubbleIcon({
+          main,
+          id: "home-icon",
+          icon: home.icon,
+          fieldConfig: entities.home,
+          tertiaryTemplate: templatesObj.tertiary?.[tertiaryTemplateKey("home")],
+        })}
         ${homeUsageToDisplay}
         <svg class="home-circle-sections">
           ${homeSolarCircumference !== undefined

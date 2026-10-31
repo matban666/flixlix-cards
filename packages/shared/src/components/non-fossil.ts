@@ -13,6 +13,7 @@ import { displayNonFossilState } from "@flixlix-cards/shared/utils/display-non-f
 import { showLine } from "@flixlix-cards/shared/utils/show-line";
 import { styleLine } from "@flixlix-cards/shared/utils/style-line";
 import { html, nothing, svg, type TemplateResult } from "lit";
+import { bubbleIcon, tertiaryTemplateKey } from "./misc/bubble-icon";
 import { generalSecondarySpan } from "./spans/general-secondary-span";
 
 interface NonFossil {
@@ -75,9 +76,13 @@ export const nonFossilElement = (
     >
       <ha-ripple .disabled=${disableEntityClick}></ha-ripple>
       ${generalSecondarySpan(main.hass, main, config, templatesObj, nonFossil, "nonFossilFuel")}
-      ${nonFossil.icon !== " "
-        ? html` <ha-icon id="low-carbon-icon" .icon=${nonFossil.icon}></ha-icon>`
-        : nothing}
+      ${bubbleIcon({
+        main,
+        id: "low-carbon-icon",
+        icon: nonFossil.icon,
+        fieldConfig: entities.fossil_fuel_percentage,
+        tertiaryTemplate: templatesObj.tertiary?.[tertiaryTemplateKey("nonFossilFuel")],
+      })}
       ${entities.fossil_fuel_percentage?.display_zero_state !== false ||
       (nonFossil.state.power || 0) > (entities.fossil_fuel_percentage?.display_zero_tolerance || 0)
         ? html`

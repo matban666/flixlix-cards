@@ -2,9 +2,11 @@ import {
   type CardMainContext,
   type ConfigEntities,
   type FlowCardPlusConfig,
+  type TemplatesObj,
 } from "@flixlix-cards/shared/types";
 import { displayValue } from "@flixlix-cards/shared/utils/display-value";
 import { html, nothing } from "lit";
+import { bubbleIcon, tertiaryTemplateKey } from "./misc/bubble-icon";
 
 export const batteryElement = (
   main: CardMainContext,
@@ -12,12 +14,21 @@ export const batteryElement = (
   {
     battery,
     entities,
+    templatesObj,
   }: {
     battery: any;
     entities: ConfigEntities;
+    templatesObj?: TemplatesObj;
   }
 ) => {
   const disableEntityClick = config.clickable_entities === false;
+  const iconEl = bubbleIcon({
+    main,
+    id: "battery-icon",
+    icon: battery.icon,
+    fieldConfig: entities.battery,
+    tertiaryTemplate: templatesObj?.tertiary?.[tertiaryTemplateKey("battery")],
+  });
   return html`<div class="circle-container battery">
     <div
       class="circle ${disableEntityClick ? "pointer-events-none" : ""}"
@@ -95,10 +106,9 @@ export const batteryElement = (
             })}
           </span>`
         : nothing}
-      ${battery.icon !== " "
-        ? html` <ha-icon
-            id="battery-icon"
-            .icon=${battery.icon}
+      ${iconEl !== nothing
+        ? html`<span
+            class="battery-icon-actions"
             @click=${(e: MouseEvent) => {
               main.onEntityClick(e, battery, entities.battery?.state_of_charge);
             }}
@@ -119,7 +129,8 @@ export const batteryElement = (
                 main.openDetails(e, battery, entities.battery?.state_of_charge, "tap");
               }
             }}
-          ></ha-icon>`
+            >${iconEl}</span
+          >`
         : nothing}
       ${entities.battery?.display_state === "two_way" ||
       entities.battery?.display_state === undefined ||

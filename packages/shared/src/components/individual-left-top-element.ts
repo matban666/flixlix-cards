@@ -10,6 +10,7 @@ import { computeIndividualFlowRate } from "@flixlix-cards/shared/utils/compute-f
 import { showLine } from "@flixlix-cards/shared/utils/show-line";
 import { styleLine } from "@flixlix-cards/shared/utils/style-line";
 import { html, nothing, svg } from "lit";
+import { bubbleIcon, tertiaryTemplateKey } from "./misc/bubble-icon";
 import { spacer } from "./spacer";
 import { individualSecondarySpan } from "./spans/individual-secondary-span";
 
@@ -65,9 +66,14 @@ export const individualLeftTopElement = (
         indexOfIndividual,
         "left-top"
       )}
-      ${individualObj.icon !== " "
-        ? html` <ha-icon id="individual-left-top-icon" .icon=${individualObj.icon}></ha-icon>`
-        : nothing}
+      ${bubbleIcon({
+        main,
+        id: "individual-left-top-icon",
+        icon: individualObj.icon,
+        fieldConfig: individualObj.field,
+        tertiaryTemplate:
+          templatesObj.tertiary?.[tertiaryTemplateKey({ individual: individualObj.entity })],
+      })}
       ${individualObj?.field?.display_zero_state !== false ||
       (individualObj.state || 0) > (individualObj.displayZeroTolerance ?? 0)
         ? html` <span class="individual-top individual-left-top">
