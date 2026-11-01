@@ -8,6 +8,7 @@ import {
 import { displayValue } from "@flixlix-cards/shared/utils/display-value";
 import { isNumberValue } from "@flixlix-cards/shared/utils/utils";
 import { html, nothing } from "lit";
+import { bubbleLabel } from "./misc/bubble-alert";
 import { bubbleIcon, tertiaryTemplateKey } from "./misc/bubble-icon";
 import { generalSecondarySpan } from "./spans/general-secondary-span";
 
@@ -48,7 +49,7 @@ export const solarElement = (
     ? solar.state.total - secondarySolarStateWatts
     : solar.state.total;
   return html`<div class="circle-container solar">
-    <span class="label">${solar.name}</span>
+    ${bubbleLabel(main.hass, entities.solar?.alert, solar.name)}
     <div
       class="circle ${disableEntityClick ? "pointer-events-none" : ""}"
       data-pfcp-bubble="solar"

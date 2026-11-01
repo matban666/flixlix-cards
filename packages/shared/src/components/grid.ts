@@ -6,6 +6,7 @@ import {
 } from "@flixlix-cards/shared/types";
 import { displayValue } from "@flixlix-cards/shared/utils/display-value";
 import { html, nothing } from "lit";
+import { bubbleLabel } from "./misc/bubble-alert";
 import { bubbleIcon, tertiaryTemplateKey } from "./misc/bubble-icon";
 import { generalSecondarySpan } from "./spans/general-secondary-span";
 
@@ -201,6 +202,6 @@ export const gridElement = (
         ? html`<span class="grid power-outage">${grid.powerOutage.name}</span>`
         : nothing}
     </div>
-    <span class="label">${grid.name}</span>
+    ${bubbleLabel(main.hass, entities.grid?.alert, grid.name)}
   </div>`;
 };

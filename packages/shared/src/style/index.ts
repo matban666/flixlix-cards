@@ -305,6 +305,20 @@ export const styles = css`
     min-height: 20px;
   }
 
+  /* The label keeps the circle's width so a "(plug in)" suffix never changes the row layout;
+     the text overflows evenly on both sides instead (flex centring overflows both ways). */
+  .label.pfcp-label-alert {
+    width: var(--circle-size);
+    max-width: none;
+    display: flex;
+    justify-content: center;
+    overflow: visible;
+    text-overflow: clip;
+  }
+  .pfcp-alert-text {
+    margin-left: 0.3em;
+    flex-shrink: 0;
+  }
   .card-content.no-labels .label {
     display: none;
   }

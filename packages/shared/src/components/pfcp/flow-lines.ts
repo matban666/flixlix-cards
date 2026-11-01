@@ -9,14 +9,21 @@ import { property, state } from "lit/decorators.js";
 
 /**
  * Flow lines between the solar, grid, home, battery and device bubbles, drawn from the bubbles'
- * measured positions so every line ends on a bubble border at any card width.
+ * measured positions so every line ends on a bubble border at any card width. Also draws the
+ * "!" badge on bubbles with an active `alert`.
  *
  * Lives in its own shadow DOM: the card's broad rules (`path {}`, `.circle svg {}`, ...) can't
  * reach in, and these styles can't leak out. Colours come in through the card's CSS variables.
  */
 
 export type IndividualPosition = "left-top" | "left-bottom" | "right-top" | "right-bottom";
-export type BubbleKey = "solar" | "grid" | "home" | "battery" | `individual-${IndividualPosition}`;
+export type BubbleKey =
+  | "solar"
+  | "grid"
+  | "home"
+  | "battery"
+  | "non-fossil"
+  | `individual-${IndividualPosition}`;
 export type FlowLineKey =
   | `individual-${IndividualPosition}`
   | "solar-home"
@@ -273,6 +280,9 @@ const sameGeometry = (a: Geometry | undefined, b: Geometry) => {
 export class PfcpFlowLines extends LitElement {
   @property({ attribute: false }) public lines: FlowLine[] = [];
 
+  /** Bubbles with an active alert, mapped to the badge colour. */
+  @property({ attribute: false }) public badges: Partial<Record<BubbleKey, string>> = {};
+
   @state() private _geometry?: Geometry;
 
   private _resizeObserver?: ResizeObserver;
@@ -293,7 +303,7 @@ export class PfcpFlowLines extends LitElement {
 
   protected updated(changed: PropertyValues): void {
     // The card re-renders (and may change bubble sizes) whenever `lines` is reassigned.
-    if (changed.has("lines")) this._measure();
+    if (changed.has("lines") || changed.has("badges")) this._measure();
   }
 
   /** Bubble centres and radii in this element's own (untransformed) pixel space. */
@@ -346,11 +356,25 @@ export class PfcpFlowLines extends LitElement {
               </circle>`
           )}`;
       })}
+      ${(Object.entries(this.badges) as [BubbleKey, string][]).map(([key, color]) => {
+        const b = g.bubbles[key];
+        if (!b) return nothing;
+        // On the border at the top-right (45 degrees), straddling it like a notification badge.
+        const cx = b.x + b.r * Math.SQRT1_2;
+        const cy = b.y - b.r * Math.SQRT1_2;
+        const r = b.r * 0.2;
+        return svg`<g class="badge">
+            <circle cx="${cx}" cy="${cy}" r="${r}" style="fill: ${color}"></circle>
+            <text x="${cx}" y="${cy}" font-size="${r * 1.5}">!</text>
+          </g>`;
+      })}
     </svg>`;
   }
 
   static styles = css`
     :host {
+      /* Above the bubbles so badges aren't hidden under a ring; lines only meet the borders. */
+      z-index: 3;
       position: absolute;
       inset: 0;
       display: block;
@@ -369,6 +393,17 @@ export class PfcpFlowLines extends LitElement {
     }
     .line.transparency {
       opacity: calc(calc(100 - var(--transparency, 0)) / 100);
+    }
+    .badge circle {
+      stroke: var(--card-background-color, #fff);
+      stroke-width: 1.5;
+    }
+    .badge text {
+      fill: #fff;
+      font-weight: 700;
+      text-anchor: middle;
+      dominant-baseline: central;
+      font-family: inherit;
     }
     .line.grey {
       stroke: var(--greyed-out--line-color, #bdbdbd) !important;

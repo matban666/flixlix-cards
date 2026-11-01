@@ -5,6 +5,7 @@ import { individualLeftBottomElement } from "@flixlix-cards/shared/components/in
 import { individualLeftTopElement } from "@flixlix-cards/shared/components/individual-left-top-element";
 import { individualRightBottomElement } from "@flixlix-cards/shared/components/individual-right-bottom-element";
 import { individualRightTopElement } from "@flixlix-cards/shared/components/individual-right-top-element";
+import { alertBadges } from "@flixlix-cards/shared/components/misc/bubble-alert";
 import { tertiaryTemplateKey } from "@flixlix-cards/shared/components/misc/bubble-icon";
 import { dashboardLinkElement } from "@flixlix-cards/shared/components/misc/dashboard-link";
 import { nonFossilElement } from "@flixlix-cards/shared/components/non-fossil";
@@ -402,24 +403,6 @@ export class PowerFlowCardPlus extends LitElement {
           id="power-flow-card-plus"
           style=${this._config.style_card_content ? this._config.style_card_content : ""}
         >
-          <pfcp-flow-lines
-            .lines=${flowLinesData(this._config, {
-              battery,
-              grid,
-              solar,
-              newDur,
-              individuals: [
-                { position: "left-top", obj: individualFieldLeftTop },
-                { position: "left-bottom", obj: individualFieldLeftBottom },
-                ...(checkHasRightIndividual(individualObjs)
-                  ? ([
-                      { position: "right-top", obj: individualFieldRightTop },
-                      { position: "right-bottom", obj: individualFieldRightBottom },
-                    ] as const)
-                  : []),
-              ],
-            })}
-          ></pfcp-flow-lines>
           ${solar.has ||
           individualObjs?.some((individual) => individual?.has) ||
           nonFossil.hasPercentage
@@ -515,6 +498,35 @@ export class PowerFlowCardPlus extends LitElement {
                   : nothing}
               </div>`
             : spacer}
+          <pfcp-flow-lines
+            .lines=${flowLinesData(this._config, {
+              battery,
+              grid,
+              solar,
+              newDur,
+              individuals: [
+                { position: "left-top", obj: individualFieldLeftTop },
+                { position: "left-bottom", obj: individualFieldLeftBottom },
+                ...(checkHasRightIndividual(individualObjs)
+                  ? ([
+                      { position: "right-top", obj: individualFieldRightTop },
+                      { position: "right-bottom", obj: individualFieldRightBottom },
+                    ] as const)
+                  : []),
+              ],
+            })}
+            .badges=${alertBadges(this.hass, {
+              solar: entities.solar,
+              grid: entities.grid,
+              home: entities.home,
+              battery: entities.battery,
+              "non-fossil": entities.fossil_fuel_percentage,
+              "individual-left-top": individualFieldLeftTop?.field,
+              "individual-left-bottom": individualFieldLeftBottom?.field,
+              "individual-right-top": individualFieldRightTop?.field,
+              "individual-right-bottom": individualFieldRightBottom?.field,
+            })}
+          ></pfcp-flow-lines>
         </div>
         ${dashboardLinkElement(this._config, this.hass)}
       </ha-card>
