@@ -29,7 +29,7 @@ export const batteryElement = (
     fieldConfig: entities.battery,
     tertiaryTemplate: templatesObj?.tertiary?.[tertiaryTemplateKey("battery")],
   });
-  return html`<div class="circle-container battery">
+  return html`<div class="circle-container battery pfcp-battery">
     <div
       class="circle ${disableEntityClick ? "pointer-events-none" : ""}"
       data-pfcp-bubble="battery"

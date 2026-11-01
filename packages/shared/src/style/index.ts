@@ -241,6 +241,13 @@ export const styles = css`
     height: 110px;
     justify-content: flex-end;
   }
+  /* Anchor the battery circle 10px from the row top, like the bottom device bubbles, instead of
+     110px minus its label: a theme with taller labels otherwise lifts the battery above them. */
+  .circle-container.battery.pfcp-battery {
+    justify-content: flex-start;
+    padding-top: 10px;
+    box-sizing: border-box;
+  }
   .spacer {
     width: var(--size-circle-entity);
   }

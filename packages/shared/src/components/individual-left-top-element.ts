@@ -15,6 +15,8 @@ import { spacer } from "./spacer";
 import { individualSecondarySpan } from "./spans/individual-secondary-span";
 
 interface TopIndividual {
+  /** Line drawn elsewhere (pfcp-flow-lines): keep an empty box so the layout is unchanged. */
+  externalLine?: boolean;
   newDur: NewDur;
   templatesObj: TemplatesObj;
   individualObj?: IndividualObject;
@@ -24,7 +26,7 @@ interface TopIndividual {
 export const individualLeftTopElement = (
   main: CardMainContext,
   config: FlowCardPlusConfig,
-  { individualObj, templatesObj, displayState, newDur }: TopIndividual
+  { individualObj, templatesObj, displayState, newDur, externalLine }: TopIndividual
 ) => {
   if (!individualObj) return spacer;
   const disableEntityClick = config.clickable_entities === false;
@@ -35,6 +37,7 @@ export const individualLeftTopElement = (
     <span class="label">${individualObj.name}</span>
     <div
       class="circle ${disableEntityClick ? "pointer-events-none" : ""}"
+      data-pfcp-bubble="individual-left-top"
       @click=${(e: MouseEvent) => {
         main.onEntityClick(e, individualObj?.field, individualObj?.entity);
       }}
@@ -87,33 +90,35 @@ export const individualLeftTopElement = (
         : nothing}
     </div>
     ${showLine(config, individualObj.state || 0) && !config.entities.home?.hide
-      ? html`
-          <svg width="80" height="30">
-            <path
-              d="M40 -10 v50"
-              id="individual-top"
-              class="${styleLine(individualObj.state || 0, config)}"
-            />
-            ${checkShouldShowDots(config) &&
-            individualObj.state &&
-            individualObj.state >= (individualObj.displayZeroTolerance ?? 0)
-              ? svg`<circle r="1.75" class="individual-top" vector-effect="non-scaling-stroke">
-                    <animateMotion
-                      dur="${computeIndividualFlowRate(
-                        individualObj?.field?.calculate_flow_rate,
-                        duration
-                      )}s"
-                      repeatCount="indefinite"
-                      calcMode="paced"
-                      keyPoints="${individualObj.invertAnimation ? "0;1" : "1;0"}"
-                      keyTimes="0;1"
-                    >
-                      <mpath xlink:href="#individual-top" />
-                    </animateMotion>
-                  </circle>`
-              : nothing}
-          </svg>
-        `
+      ? externalLine
+        ? html`<svg width="80" height="30"></svg>`
+        : html`
+            <svg width="80" height="30">
+              <path
+                d="M40 -10 v50"
+                id="individual-top"
+                class="${styleLine(individualObj.state || 0, config)}"
+              />
+              ${checkShouldShowDots(config) &&
+              individualObj.state &&
+              individualObj.state >= (individualObj.displayZeroTolerance ?? 0)
+                ? svg`<circle r="1.75" class="individual-top" vector-effect="non-scaling-stroke">
+                      <animateMotion
+                        dur="${computeIndividualFlowRate(
+                          individualObj?.field?.calculate_flow_rate,
+                          duration
+                        )}s"
+                        repeatCount="indefinite"
+                        calcMode="paced"
+                        keyPoints="${individualObj.invertAnimation ? "0;1" : "1;0"}"
+                        keyTimes="0;1"
+                      >
+                        <mpath xlink:href="#individual-top" />
+                      </animateMotion>
+                    </circle>`
+                : nothing}
+            </svg>
+          `
       : nothing}
   </div>`;
 };
