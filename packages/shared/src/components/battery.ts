@@ -32,6 +32,7 @@ export const batteryElement = (
   return html`<div class="circle-container battery">
     <div
       class="circle ${disableEntityClick ? "pointer-events-none" : ""}"
+      data-pfcp-bubble="battery"
       @click=${(e: MouseEvent) => {
         const target = entities.battery?.state_of_charge
           ? entities.battery?.state_of_charge
@@ -108,7 +109,7 @@ export const batteryElement = (
         : nothing}
       ${iconEl !== nothing
         ? html`<span
-            class="battery-icon-actions"
+            class="pfcp-battery-icon-actions"
             @click=${(e: MouseEvent) => {
               main.onEntityClick(e, battery, entities.battery?.state_of_charge);
             }}

@@ -104,24 +104,24 @@ export const styles = css`
 
   /* A row is any direct child that renders a line: text spans, the icon, or the icon wrapper. */
   .circle:has(
-    > :is(span, ha-icon, ha-svg-icon, .bubble-icon, .icon-container)
-      ~ :is(span, ha-icon, ha-svg-icon, .bubble-icon, .icon-container)
-      ~ :is(span, ha-icon, ha-svg-icon, .bubble-icon, .icon-container)
+    > :is(span, ha-icon, ha-svg-icon, .pfcp-bubble-icon, .pfcp-icon-container)
+      ~ :is(span, ha-icon, ha-svg-icon, .pfcp-bubble-icon, .pfcp-icon-container)
+      ~ :is(span, ha-icon, ha-svg-icon, .pfcp-bubble-icon, .pfcp-icon-container)
   ) {
     --circle-text-ratio: 0.16;
     --circle-icon-ratio: 0.36;
   }
   .circle:has(
-    > :is(span, ha-icon, ha-svg-icon, .bubble-icon, .icon-container)
-      ~ :is(span, ha-icon, ha-svg-icon, .bubble-icon, .icon-container)
-      ~ :is(span, ha-icon, ha-svg-icon, .bubble-icon, .icon-container)
-      ~ :is(span, ha-icon, ha-svg-icon, .bubble-icon, .icon-container)
+    > :is(span, ha-icon, ha-svg-icon, .pfcp-bubble-icon, .pfcp-icon-container)
+      ~ :is(span, ha-icon, ha-svg-icon, .pfcp-bubble-icon, .pfcp-icon-container)
+      ~ :is(span, ha-icon, ha-svg-icon, .pfcp-bubble-icon, .pfcp-icon-container)
+      ~ :is(span, ha-icon, ha-svg-icon, .pfcp-bubble-icon, .pfcp-icon-container)
   ) {
     --circle-text-ratio: 0.14;
     --circle-icon-ratio: 0.28;
   }
   .circle ha-icon,
-  .circle .bubble-icon {
+  .circle .pfcp-bubble-icon {
     padding-bottom: 0;
   }
   .circle ha-icon.small {
@@ -258,24 +258,24 @@ export const styles = css`
   ha-icon.small {
     --mdc-icon-size: 12px;
   }
-  .bubble-icon {
+  .pfcp-bubble-icon {
     display: inline;
     padding-bottom: 2px;
   }
-  .battery-icon-actions {
+  .pfcp-battery-icon-actions {
     display: contents;
   }
-  .icon-container {
+  .pfcp-icon-container {
     position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
   }
-  .icon-container > ha-icon,
-  .icon-container > .bubble-icon {
+  .pfcp-icon-container > ha-icon,
+  .pfcp-icon-container > .pfcp-bubble-icon {
     padding-bottom: 0;
   }
-  .icon-container > .tertiary-info {
+  .pfcp-icon-container > .pfcp-tertiary-info {
     position: absolute;
     inset: 0;
     display: flex;
@@ -333,11 +333,6 @@ export const styles = css`
     height: 100%;
     top: 0;
     left: 0;
-  }
-  /* Outline icons are inline SVGs too; keep them in the flow, sized by their inline style. */
-  .circle svg.bubble-icon {
-    position: static;
-    overflow: visible;
   }
 
   span.secondary-info {
@@ -452,7 +447,7 @@ export const styles = css`
     border-color: var(--non-fossil-color);
   }
   .low-carbon ha-icon:not(.small),
-  .low-carbon .bubble-icon {
+  .low-carbon .pfcp-bubble-icon {
     color: var(--icon-non-fossil-color);
   }
   circle.low-carbon {
@@ -467,7 +462,7 @@ export const styles = css`
     border-color: var(--energy-solar-color);
   }
   .solar ha-icon:not(.small),
-  .solar .bubble-icon {
+  .solar .pfcp-bubble-icon {
     color: var(--icon-solar-color);
   }
   circle.solar,
@@ -520,7 +515,7 @@ export const styles = css`
     stroke: var(--battery-grid-line);
   }
   .battery ha-icon:not(.small),
-  .battery .bubble-icon {
+  .battery .pfcp-bubble-icon {
     color: var(--icon-battery-color);
   }
 
@@ -560,7 +555,7 @@ export const styles = css`
     fill: var(--energy-grid-consumption-color);
   }
   .grid ha-icon:not(.small),
-  .grid .bubble-icon {
+  .grid .pfcp-bubble-icon {
     color: var(--icon-grid-color);
   }
   .home .circle {
@@ -571,7 +566,7 @@ export const styles = css`
     border-width: 2px;
   }
   .home ha-icon:not(.small),
-  .home .bubble-icon {
+  .home .pfcp-bubble-icon {
     color: var(--icon-home-color);
   }
   .circle svg circle {
