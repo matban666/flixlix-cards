@@ -15,6 +15,8 @@ import { spacer } from "./spacer";
 import { individualSecondarySpan } from "./spans/individual-secondary-span";
 
 interface IndividualBottom {
+  /** Line drawn elsewhere (pfcp-flow-lines): keep an empty box so the layout is unchanged. */
+  externalLine?: boolean;
   newDur: NewDur;
   templatesObj: TemplatesObj;
   individualObj?: IndividualObject;
@@ -24,7 +26,7 @@ interface IndividualBottom {
 export const individualLeftBottomElement = (
   main: CardMainContext,
   config: FlowCardPlusConfig,
-  { individualObj, templatesObj, displayState, newDur }: IndividualBottom
+  { individualObj, templatesObj, displayState, newDur, externalLine }: IndividualBottom
 ) => {
   if (!individualObj) return spacer;
   const disableEntityClick = config.clickable_entities === false;
@@ -33,36 +35,39 @@ export const individualLeftBottomElement = (
   const duration = newDur.individual[indexOfIndividual] || 0;
   return html`<div class="circle-container individual-bottom bottom">
     ${showLine(config, individualObj?.state || 0) && !config.entities.home?.hide
-      ? html`
-          <svg width="80" height="30">
-            <path
-              d="M40 40 v-40"
-              id="individual-bottom"
-              class="${styleLine(individualObj?.state || 0, config)}"
-            />
-            ${checkShouldShowDots(config) &&
-            individualObj?.state &&
-            individualObj.state >= (individualObj.displayZeroTolerance ?? 0)
-              ? svg`<circle r="1.75" class="individual-bottom" vector-effect="non-scaling-stroke">
-                    <animateMotion
-                      dur="${computeIndividualFlowRate(
-                        individualObj.field?.calculate_flow_rate !== false,
-                        duration
-                      )}s"
-                      repeatCount="indefinite"
-                      calcMode="paced"
-                      keyPoints="${individualObj.invertAnimation ? "0;1" : "1;0"}"
-                      keyTimes="0;1"
-                    >
-                      <mpath xlink:href="#individual-bottom" />
-                    </animateMotion>
-                  </circle>`
-              : nothing}
-          </svg>
-        `
+      ? externalLine
+        ? html`<svg width="80" height="30"></svg>`
+        : html`
+            <svg width="80" height="30">
+              <path
+                d="M40 40 v-40"
+                id="individual-bottom"
+                class="${styleLine(individualObj?.state || 0, config)}"
+              />
+              ${checkShouldShowDots(config) &&
+              individualObj?.state &&
+              individualObj.state >= (individualObj.displayZeroTolerance ?? 0)
+                ? svg`<circle r="1.75" class="individual-bottom" vector-effect="non-scaling-stroke">
+                      <animateMotion
+                        dur="${computeIndividualFlowRate(
+                          individualObj.field?.calculate_flow_rate !== false,
+                          duration
+                        )}s"
+                        repeatCount="indefinite"
+                        calcMode="paced"
+                        keyPoints="${individualObj.invertAnimation ? "0;1" : "1;0"}"
+                        keyTimes="0;1"
+                      >
+                        <mpath xlink:href="#individual-bottom" />
+                      </animateMotion>
+                    </circle>`
+                : nothing}
+            </svg>
+          `
       : html` <svg width="80" height="30"></svg> `}
     <div
       class="circle ${disableEntityClick ? "pointer-events-none" : ""}"
+      data-pfcp-bubble="individual-left-bottom"
       @click=${(e: MouseEvent) => {
         main.onEntityClick(e, individualObj?.field, individualObj?.entity);
       }}

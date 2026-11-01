@@ -1,20 +1,24 @@
+import { type IndividualObject } from "@flixlix-cards/shared/states/raw/individual/get-individual-object";
 import { type FlowCardPlusConfig, type NewDur } from "@flixlix-cards/shared/types";
 import { checkShouldShowDots } from "@flixlix-cards/shared/utils/check-should-show-dots";
+import { computeIndividualFlowRate } from "@flixlix-cards/shared/utils/compute-flow-rate";
 import { showLine } from "@flixlix-cards/shared/utils/show-line";
 import { styleLine } from "@flixlix-cards/shared/utils/style-line";
 import { css, html, LitElement, nothing, svg, type PropertyValues } from "lit";
 import { property, state } from "lit/decorators.js";
 
 /**
- * Flow lines between the solar, grid, home and battery bubbles, drawn from the bubbles'
+ * Flow lines between the solar, grid, home, battery and device bubbles, drawn from the bubbles'
  * measured positions so every line ends on a bubble border at any card width.
  *
  * Lives in its own shadow DOM: the card's broad rules (`path {}`, `.circle svg {}`, ...) can't
  * reach in, and these styles can't leak out. Colours come in through the card's CSS variables.
  */
 
-export type BubbleKey = "solar" | "grid" | "home" | "battery";
+export type IndividualPosition = "left-top" | "left-bottom" | "right-top" | "right-bottom";
+export type BubbleKey = "solar" | "grid" | "home" | "battery" | `individual-${IndividualPosition}`;
 export type FlowLineKey =
+  | `individual-${IndividualPosition}`
   | "solar-home"
   | "solar-grid"
   | "solar-battery"
@@ -28,10 +32,32 @@ export type FlowLine = { key: FlowLineKey; color: string; zeroStyle: string; dot
 type Bubble = { x: number; y: number; r: number };
 type Geometry = { width: number; height: number; bubbles: Partial<Record<BubbleKey, Bubble>> };
 
+/** A device bubble and where the card placed it. */
+export type PlacedIndividual = { position: IndividualPosition; obj: IndividualObject | undefined };
+
+const individualColor: Record<IndividualPosition, string> = {
+  "left-top": "var(--individual-left-top-color)",
+  "left-bottom": "var(--individual-left-bottom-color)",
+  "right-top": "var(--individual-right-top-color)",
+  "right-bottom": "var(--individual-right-bottom-color)",
+};
+
 /** Which lines to draw and how, using the same rules as the original per-line components. */
 export const flowLinesData = (
   config: FlowCardPlusConfig,
-  { battery, grid, solar, newDur }: { battery: any; grid: any; solar: any; newDur: NewDur }
+  {
+    battery,
+    grid,
+    solar,
+    newDur,
+    individuals = [],
+  }: {
+    battery: any;
+    grid: any;
+    solar: any;
+    newDur: NewDur;
+    individuals?: PlacedIndividual[];
+  }
 ): FlowLine[] => {
   const dots = checkShouldShowDots(config);
   const homeShown = !config.entities.home?.hide;
@@ -126,6 +152,37 @@ export const flowLinesData = (
       },
     ]
   );
+
+  // Device connectors. Dots run home -> device unless inverted_animation, as before.
+  for (const { position, obj } of individuals) {
+    if (!obj) continue;
+    const index = config.entities.individual?.findIndex((e) => e.entity === obj.entity) ?? -1;
+    const isRight = position.startsWith("right");
+    const duration = newDur.individual[index] || (isRight ? 1.66 : 0);
+    // The left-bottom element defaulted calculate_flow_rate to on; the others pass it through.
+    const calculate =
+      position === "left-bottom"
+        ? obj.field?.calculate_flow_rate !== false
+        : obj.field?.calculate_flow_rate;
+    const state = obj.state || 0;
+    add(
+      homeShown && showLine(config, state),
+      {
+        key: `individual-${position}`,
+        color: individualColor[position],
+        zeroStyle: styleLine(state, config),
+      },
+      [
+        !!obj.state &&
+          obj.state >= (obj.displayZeroTolerance ?? 0) && {
+            dur: computeIndividualFlowRate(calculate, duration),
+            color: individualColor[position],
+            // Left paths run home -> device; right paths (bends) run device -> home.
+            reverse: isRight ? !obj.invertAnimation : obj.invertAnimation,
+          },
+      ]
+    );
+  }
   return lines;
 };
 
@@ -154,9 +211,29 @@ const bend = (from: Bubble, to: Bubble, gap: number, fromBelow: boolean): string
   );
 };
 
+/** Straight line between two bubbles along their centre line, from edge to edge. */
+const straight = (from: Bubble, to: Bubble): string => {
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const len = Math.hypot(dx, dy) || 1;
+  const ux = dx / len;
+  const uy = dy / len;
+  return `M${from.x + ux * from.r},${from.y + uy * from.r} L${to.x - ux * to.r},${to.y - uy * to.r}`;
+};
+
 const linePath = (key: FlowLineKey, b: Geometry["bubbles"]): string | undefined => {
   const gap = (b.home?.r ?? 40) * 0.15;
   switch (key) {
+    case "individual-left-top":
+    case "individual-left-bottom": {
+      const device = b[key];
+      return b.home && device && straight(b.home, device);
+    }
+    case "individual-right-top":
+    case "individual-right-bottom": {
+      const device = b[key];
+      return b.home && device && bend(device, b.home, gap, key === "individual-right-bottom");
+    }
     case "solar-home":
       return b.solar && b.home && bend(b.solar, b.home, gap, false);
     case "solar-grid":

@@ -403,7 +403,22 @@ export class PowerFlowCardPlus extends LitElement {
           style=${this._config.style_card_content ? this._config.style_card_content : ""}
         >
           <pfcp-flow-lines
-            .lines=${flowLinesData(this._config, { battery, grid, solar, newDur })}
+            .lines=${flowLinesData(this._config, {
+              battery,
+              grid,
+              solar,
+              newDur,
+              individuals: [
+                { position: "left-top", obj: individualFieldLeftTop },
+                { position: "left-bottom", obj: individualFieldLeftBottom },
+                ...(checkHasRightIndividual(individualObjs)
+                  ? ([
+                      { position: "right-top", obj: individualFieldRightTop },
+                      { position: "right-bottom", obj: individualFieldRightBottom },
+                    ] as const)
+                  : []),
+              ],
+            })}
           ></pfcp-flow-lines>
           ${solar.has ||
           individualObjs?.some((individual) => individual?.has) ||
@@ -427,6 +442,7 @@ export class PowerFlowCardPlus extends LitElement {
                     : nothing}
                 ${individualFieldLeftTop
                   ? individualLeftTopElement(this, this._config, {
+                      externalLine: true,
                       individualObj: individualFieldLeftTop,
                       displayState: getIndividualDisplayState(individualFieldLeftTop),
                       newDur,
@@ -435,6 +451,7 @@ export class PowerFlowCardPlus extends LitElement {
                   : spacer}
                 ${checkHasRightIndividual(individualObjs)
                   ? individualRightTopElement(this, this._config, {
+                      externalLine: true,
                       displayState: getIndividualDisplayState(individualFieldRightTop),
                       individualObj: individualFieldRightTop,
                       newDur,
@@ -480,6 +497,7 @@ export class PowerFlowCardPlus extends LitElement {
                   : spacer}
                 ${individualFieldLeftBottom
                   ? individualLeftBottomElement(this, this._config, {
+                      externalLine: true,
                       displayState: getIndividualDisplayState(individualFieldLeftBottom),
                       individualObj: individualFieldLeftBottom,
                       newDur,
@@ -488,6 +506,7 @@ export class PowerFlowCardPlus extends LitElement {
                   : spacer}
                 ${checkHasRightIndividual(individualObjs)
                   ? individualRightBottomElement(this, this._config, {
+                      externalLine: true,
                       displayState: getIndividualDisplayState(individualFieldRightBottom),
                       individualObj: individualFieldRightBottom,
                       newDur,
