@@ -1,0 +1,10 @@
+# Demo EV state of charge for the showcase's car icon.
+input_number:
+  ev_soc:
+    name: EV state of charge
+    min: 0
+    max: 100
+    step: 1
+    initial: 65
+    unit_of_measurement: "%"
+    mode: slider

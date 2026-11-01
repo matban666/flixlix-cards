@@ -1,0 +1,8 @@
+# Demo stored-energy sensor for the showcase: battery_soc (%) of a 10 kWh battery.
+template:
+  - sensor:
+      - name: Battery energy
+        unique_id: demo_battery_energy
+        unit_of_measurement: kWh
+        device_class: energy_storage
+        state: "{{ (states('input_number.battery_soc') | float(0) / 100 * 10) | round(2) }}"
