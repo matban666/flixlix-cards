@@ -13,6 +13,7 @@ import { displayNonFossilState } from "@flixlix-cards/shared/utils/display-non-f
 import { showLine } from "@flixlix-cards/shared/utils/show-line";
 import { styleLine } from "@flixlix-cards/shared/utils/style-line";
 import { html, nothing, svg, type TemplateResult } from "lit";
+import { bubbleLabel } from "./misc/bubble-alert";
 import { bubbleIcon, tertiaryTemplateKey } from "./misc/bubble-icon";
 import { generalSecondarySpan } from "./spans/general-secondary-span";
 
@@ -33,9 +34,10 @@ export const nonFossilElement = (
   const disableEntityClick = config.clickable_entities === false;
   if (!nonFossil.hasPercentage) return spacer;
   return html`<div class="circle-container low-carbon">
-    <span class="label">${nonFossil.name}</span>
+    ${bubbleLabel(main.hass, entities.fossil_fuel_percentage?.alert, nonFossil.name)}
     <div
       class="circle ${disableEntityClick ? "pointer-events-none" : ""}"
+      data-pfcp-bubble="non-fossil"
       @click=${(e: MouseEvent) => {
         main.onEntityClick(
           e,

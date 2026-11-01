@@ -72,6 +72,17 @@ export interface BaseConfigEntity extends ActionConfigSet {
   /** CSS colour for this bubble's icon only (the circle and flow line keep `color`). */
   icon_color?: string;
   /** Metric shown in the centre of the bubble's icon. Same options as secondary_info. */
+  /**
+   * Show an alert on this bubble (a "!" badge and a label suffix) while `entity` is active,
+   * i.e. any state except off/false/0/empty/unknown/unavailable. A text state is used as the
+   * suffix ("plug in") unless `message` is set.
+   */
+  alert?: {
+    entity?: string;
+    message?: string;
+    /** CSS colour for the badge and suffix; defaults to the theme's error colour. */
+    color?: string;
+  };
   tertiary_info?: SecondaryInfoType & {
     /** CSS colour for the centred metric. */
     color?: string;

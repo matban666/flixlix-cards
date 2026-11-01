@@ -7,6 +7,7 @@ import {
   type TemplatesObj,
 } from "@flixlix-cards/shared/types";
 import { html, nothing, svg } from "lit";
+import { bubbleLabel } from "./misc/bubble-alert";
 import { bubbleIcon, tertiaryTemplateKey } from "./misc/bubble-icon";
 import { generalSecondarySpan } from "./spans/general-secondary-span";
 
@@ -148,7 +149,7 @@ export const homeElement = (
       </div>
       ${!showHomeLabel
         ? html`<span class="label"></span>`
-        : html`<span class="label">${home.name}</span>`}
+        : bubbleLabel(main.hass, entities.home?.alert, home.name)}
     </div>
   `;
 };

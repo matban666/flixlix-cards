@@ -10,6 +10,7 @@ import { computeIndividualFlowRate } from "@flixlix-cards/shared/utils/compute-f
 import { showLine } from "@flixlix-cards/shared/utils/show-line";
 import { styleLine } from "@flixlix-cards/shared/utils/style-line";
 import { html, nothing, svg } from "lit";
+import { bubbleLabel } from "./misc/bubble-alert";
 import { bubbleIcon, tertiaryTemplateKey } from "./misc/bubble-icon";
 import { spacer } from "./spacer";
 import { individualSecondarySpan } from "./spans/individual-secondary-span";
@@ -34,7 +35,7 @@ export const individualLeftTopElement = (
     config?.entities?.individual?.findIndex((e) => e.entity === individualObj.entity) || 0;
   const duration = newDur.individual[indexOfIndividual] || 0;
   return html`<div class="circle-container individual-top">
-    <span class="label">${individualObj.name}</span>
+    ${bubbleLabel(main.hass, individualObj.field?.alert, individualObj.name)}
     <div
       class="circle ${disableEntityClick ? "pointer-events-none" : ""}"
       data-pfcp-bubble="individual-left-top"

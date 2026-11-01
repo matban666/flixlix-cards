@@ -6,6 +6,7 @@ import {
 } from "@flixlix-cards/shared/types";
 import { displayValue } from "@flixlix-cards/shared/utils/display-value";
 import { html, nothing } from "lit";
+import { bubbleLabel } from "./misc/bubble-alert";
 import { bubbleIcon, tertiaryTemplateKey } from "./misc/bubble-icon";
 
 export const batteryElement = (
@@ -241,6 +242,6 @@ export const batteryElement = (
           >`
         : nothing}
     </div>
-    <span class="label">${battery.name}</span>
+    ${bubbleLabel(main.hass, entities.battery?.alert, battery.name)}
   </div>`;
 };

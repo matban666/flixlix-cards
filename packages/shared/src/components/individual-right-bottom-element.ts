@@ -10,6 +10,7 @@ import { computeIndividualFlowRate } from "@flixlix-cards/shared/utils/compute-f
 import { showLine } from "@flixlix-cards/shared/utils/show-line";
 import { styleLine } from "@flixlix-cards/shared/utils/style-line";
 import { html, nothing, svg } from "lit";
+import { bubbleLabel } from "./misc/bubble-alert";
 import { bubbleIcon, tertiaryTemplateKey } from "./misc/bubble-icon";
 import { spacer } from "./spacer";
 import { individualSecondarySpan } from "./spans/individual-secondary-span";
@@ -95,7 +96,7 @@ export const individualRightBottomElement = (
           </span>`
         : nothing}
     </div>
-    <span class="label">${individualObj.name}</span>
+    ${bubbleLabel(main.hass, individualObj.field?.alert, individualObj.name)}
     ${showLine(config, individualObj.state || 0) && !config.entities.home?.hide
       ? externalLine
         ? html`<div class="right-individual-flow-container">
