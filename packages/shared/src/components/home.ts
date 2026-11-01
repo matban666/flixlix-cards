@@ -55,6 +55,7 @@ export const homeElement = (
     <div class="circle-container home">
       <div
         class="circle ${disableEntityClick ? "pointer-events-none" : ""}"
+        data-pfcp-bubble="home"
         id="home-circle"
         @click=${(e: MouseEvent) => {
           main.onEntityClick(e, entities.home, entities.home?.entity);
@@ -86,7 +87,7 @@ export const homeElement = (
           fieldConfig: entities.home,
           tertiaryTemplate: templatesObj.tertiary?.[tertiaryTemplateKey("home")],
         })}
-        <span class="home-value">${homeUsageToDisplay}</span>
+        <span class="pfcp-home-value">${homeUsageToDisplay}</span>
         <svg class="home-circle-sections">
           ${homeSolarCircumference !== undefined
             ? svg`<circle

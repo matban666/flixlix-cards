@@ -7,6 +7,7 @@ import {
 import { isNumberValue, round } from "@flixlix-cards/shared/utils/utils";
 import { formatNumber } from "custom-card-helpers";
 import { html, nothing, type TemplateResult } from "lit";
+import "../pfcp/outline-icon";
 
 type BubbleIconOptions = {
   main: CardMainContext;
@@ -87,7 +88,7 @@ const tertiarySpan = (
   };
   // Stop propagation so tapping the metric opens its own entity, not the bubble's.
   return html`<span
-    class="tertiary-info"
+    class="pfcp-tertiary-info"
     style=${cssColor(tertiary.color) +
     fontScale(tertiary.font_scale) +
     offset(tertiary.offset_x, tertiary.offset_y)}
@@ -152,26 +153,18 @@ export const bubbleIcon = ({
       ? html`<ha-icon id=${id} .icon=${icon} style=${color}></ha-icon>`
       : nothing
     : stroke && stroke > 0
-      ? // ha-svg-icon only fills, so outline icons are drawn as our own stroked SVG.
-        html`<svg
+      ? // ha-svg-icon only fills; outline icons use our own shadow-DOM element.
+        html`<pfcp-outline-icon
           id=${id}
-          class="bubble-icon"
-          viewBox=${viewBox?.value ?? "0 0 24 24"}
-          style="height: var(--mdc-icon-size); width: calc(var(--mdc-icon-size) * ${viewBox?.aspect ??
-          1}); ${color}"
-        >
-          <path
-            d=${iconPath}
-            fill="none"
-            stroke="currentColor"
-            stroke-width=${stroke}
-            stroke-linejoin="round"
-            stroke-linecap="round"
-          ></path>
-        </svg>`
+          class="pfcp-bubble-icon"
+          .path=${iconPath}
+          .viewBox=${viewBox?.value ?? "0 0 24 24"}
+          .strokeWidth=${stroke}
+          style="width: calc(var(--mdc-icon-size) * ${viewBox?.aspect ?? 1}); ${color}"
+        ></pfcp-outline-icon>`
       : html`<ha-svg-icon
           id=${id}
-          class="bubble-icon"
+          class="pfcp-bubble-icon"
           .path=${iconPath}
           .viewBox=${viewBox?.value}
           style=${(viewBox ? `width: calc(var(--mdc-icon-size) * ${viewBox.aspect}); ` : "") +
@@ -180,7 +173,7 @@ export const bubbleIcon = ({
   const tertiary = tertiarySpan(main, fieldConfig, tertiaryTemplate);
 
   if (tertiary === nothing) return iconEl;
-  return html`<div class="icon-container">${iconEl}${tertiary}</div>`;
+  return html`<div class="pfcp-icon-container">${iconEl}${tertiary}</div>`;
 };
 
 export type TertiaryBubble = "grid" | "solar" | "battery" | "home" | "nonFossilFuel";

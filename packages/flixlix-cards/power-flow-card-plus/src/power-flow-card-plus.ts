@@ -1,5 +1,4 @@
 import { batteryElement } from "@flixlix-cards/shared/components/battery";
-import { flowElement } from "@flixlix-cards/shared/components/flows/index";
 import { gridElement } from "@flixlix-cards/shared/components/grid";
 import { homeElement } from "@flixlix-cards/shared/components/home";
 import { individualLeftBottomElement } from "@flixlix-cards/shared/components/individual-left-bottom-element";
@@ -9,6 +8,7 @@ import { individualRightTopElement } from "@flixlix-cards/shared/components/indi
 import { tertiaryTemplateKey } from "@flixlix-cards/shared/components/misc/bubble-icon";
 import { dashboardLinkElement } from "@flixlix-cards/shared/components/misc/dashboard-link";
 import { nonFossilElement } from "@flixlix-cards/shared/components/non-fossil";
+import { flowLinesData } from "@flixlix-cards/shared/components/pfcp/flow-lines";
 import { solarElement } from "@flixlix-cards/shared/components/solar";
 import { spacer } from "@flixlix-cards/shared/components/spacer";
 import { CIRCLE_CIRCUMFERENCE } from "@flixlix-cards/shared/const/circle";
@@ -402,6 +402,9 @@ export class PowerFlowCardPlus extends LitElement {
           id="power-flow-card-plus"
           style=${this._config.style_card_content ? this._config.style_card_content : ""}
         >
+          <pfcp-flow-lines
+            .lines=${flowLinesData(this._config, { battery, grid, solar, newDur })}
+          ></pfcp-flow-lines>
           ${solar.has ||
           individualObjs?.some((individual) => individual?.has) ||
           nonFossil.hasPercentage
@@ -493,13 +496,6 @@ export class PowerFlowCardPlus extends LitElement {
                   : nothing}
               </div>`
             : spacer}
-          ${flowElement(this._config, {
-            battery,
-            grid,
-            individual: individualObjs,
-            newDur,
-            solar,
-          })}
         </div>
         ${dashboardLinkElement(this._config, this.hass)}
       </ha-card>
