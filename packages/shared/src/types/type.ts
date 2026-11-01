@@ -65,8 +65,25 @@ export interface BaseConfigEntity extends ActionConfigSet {
   secondary_info?: SecondaryInfoType;
   /** SVG path data (24x24 viewBox) drawn instead of `icon`. */
   icon_path?: string;
+  /** viewBox for icon_path (default "0 0 24 24"). A wider box makes a wider icon at the same height. */
+  icon_viewbox?: string;
+  /** When set, icon_path is drawn as an outline of this width (viewBox units) instead of filled. */
+  icon_stroke?: number;
+  /** CSS colour for this bubble's icon only (the circle and flow line keep `color`). */
+  icon_color?: string;
   /** Metric shown in the centre of the bubble's icon. Same options as secondary_info. */
-  tertiary_info?: SecondaryInfoType;
+  tertiary_info?: SecondaryInfoType & {
+    /** CSS colour for the centred metric. */
+    color?: string;
+    /** Set false to show the number without its unit. */
+    show_unit?: boolean;
+    /** Multiplier on the metric's default size (30% of the icon height). */
+    font_scale?: number;
+    /** Moves the metric right (+) / left (-) by this fraction of the icon height. */
+    offset_x?: number;
+    /** Moves the metric down (+) / up (-) by this fraction of the icon height. */
+    offset_y?: number;
+  };
   invert_state?: boolean;
 }
 

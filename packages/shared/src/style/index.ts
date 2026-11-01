@@ -7,6 +7,7 @@ export { convertColorListToHex } from "./convert-color";
 export const styles = css`
   :host {
     --size-circle-entity: 79.99px;
+    --circle-size: 80px;
     --mdc-icon-size: 24px;
     --clickable-cursor: pointer;
     --individual-left-bottom-color: #d0cc5b;
@@ -78,8 +79,8 @@ export const styles = css`
   }
 
   .circle {
-    width: 80px;
-    height: 80px;
+    width: var(--circle-size);
+    height: var(--circle-size);
     border-radius: 50%;
     box-sizing: border-box;
     border: 2px solid;
@@ -88,13 +89,47 @@ export const styles = css`
     align-items: center;
     justify-content: center;
     text-align: center;
-    font-size: 12px;
-    line-height: 12px;
+    /* Contents scale with the circle; ratios adapt to how many rows it holds (see below). */
+    --circle-text-ratio: 0.18;
+    --circle-icon-ratio: 0.44;
+    font-size: calc(var(--circle-size) * var(--circle-text-ratio));
+    line-height: 1;
+    --mdc-icon-size: calc(var(--circle-size) * var(--circle-icon-ratio));
     position: relative;
     text-decoration: none;
     color: var(--primary-text-color);
-    gap: 2px;
+    gap: calc(var(--circle-size) * 0.02);
     overflow: hidden;
+  }
+
+  /* A row is any direct child that renders a line: text spans, the icon, or the icon wrapper. */
+  .circle:has(
+    > :is(span, ha-icon, ha-svg-icon, .bubble-icon, .icon-container)
+      ~ :is(span, ha-icon, ha-svg-icon, .bubble-icon, .icon-container)
+      ~ :is(span, ha-icon, ha-svg-icon, .bubble-icon, .icon-container)
+  ) {
+    --circle-text-ratio: 0.16;
+    --circle-icon-ratio: 0.36;
+  }
+  .circle:has(
+    > :is(span, ha-icon, ha-svg-icon, .bubble-icon, .icon-container)
+      ~ :is(span, ha-icon, ha-svg-icon, .bubble-icon, .icon-container)
+      ~ :is(span, ha-icon, ha-svg-icon, .bubble-icon, .icon-container)
+      ~ :is(span, ha-icon, ha-svg-icon, .bubble-icon, .icon-container)
+  ) {
+    --circle-text-ratio: 0.14;
+    --circle-icon-ratio: 0.28;
+  }
+  .circle ha-icon,
+  .circle .bubble-icon {
+    padding-bottom: 0;
+  }
+  .circle ha-icon.small {
+    --mdc-icon-size: 1em;
+  }
+  .circle span.secondary-info {
+    font-size: inherit;
+    max-width: calc(var(--circle-size) * 0.75);
   }
 
   .circle > ha-ripple {
@@ -223,7 +258,7 @@ export const styles = css`
   ha-icon.small {
     --mdc-icon-size: 12px;
   }
-  ha-svg-icon.bubble-icon {
+  .bubble-icon {
     display: inline;
     padding-bottom: 2px;
   }
@@ -237,7 +272,7 @@ export const styles = css`
     justify-content: center;
   }
   .icon-container > ha-icon,
-  .icon-container > ha-svg-icon {
+  .icon-container > .bubble-icon {
     padding-bottom: 0;
   }
   .icon-container > .tertiary-info {
@@ -247,7 +282,7 @@ export const styles = css`
     align-items: center;
     justify-content: center;
     gap: 1px;
-    font-size: var(--tertiary-info-font-size, 8px);
+    font-size: var(--tertiary-info-font-size, calc(var(--mdc-icon-size) * 0.3));
     line-height: 1;
     font-weight: 600;
     white-space: nowrap;
@@ -298,6 +333,11 @@ export const styles = css`
     height: 100%;
     top: 0;
     left: 0;
+  }
+  /* Outline icons are inline SVGs too; keep them in the flow, sized by their inline style. */
+  .circle svg.bubble-icon {
+    position: static;
+    overflow: visible;
   }
 
   span.secondary-info {
@@ -412,7 +452,7 @@ export const styles = css`
     border-color: var(--non-fossil-color);
   }
   .low-carbon ha-icon:not(.small),
-  .low-carbon ha-svg-icon.bubble-icon {
+  .low-carbon .bubble-icon {
     color: var(--icon-non-fossil-color);
   }
   circle.low-carbon {
@@ -427,7 +467,7 @@ export const styles = css`
     border-color: var(--energy-solar-color);
   }
   .solar ha-icon:not(.small),
-  .solar ha-svg-icon.bubble-icon {
+  .solar .bubble-icon {
     color: var(--icon-solar-color);
   }
   circle.solar,
@@ -480,7 +520,7 @@ export const styles = css`
     stroke: var(--battery-grid-line);
   }
   .battery ha-icon:not(.small),
-  .battery ha-svg-icon.bubble-icon {
+  .battery .bubble-icon {
     color: var(--icon-battery-color);
   }
 
@@ -520,7 +560,7 @@ export const styles = css`
     fill: var(--energy-grid-consumption-color);
   }
   .grid ha-icon:not(.small),
-  .grid ha-svg-icon.bubble-icon {
+  .grid .bubble-icon {
     color: var(--icon-grid-color);
   }
   .home .circle {
@@ -531,7 +571,7 @@ export const styles = css`
     border-width: 2px;
   }
   .home ha-icon:not(.small),
-  .home ha-svg-icon.bubble-icon {
+  .home .bubble-icon {
     color: var(--icon-home-color);
   }
   .circle svg circle {

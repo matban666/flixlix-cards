@@ -14,7 +14,10 @@ type BubbleIconOptions = {
   id: string;
   /** Resolved HA icon name; " " means the user hid the icon. */
   icon: string;
-  fieldConfig?: Pick<BaseConfigEntity, "icon_path" | "tertiary_info">;
+  fieldConfig?: Pick<
+    BaseConfigEntity,
+    "icon_path" | "icon_viewbox" | "icon_stroke" | "icon_color" | "tertiary_info"
+  >;
   /** Rendered tertiary_info.template result, if a template is configured. */
   tertiaryTemplate?: string;
   /** When false, icon_path is ignored so a state-driven icon (e.g. grid outage) still shows. */
@@ -42,9 +45,28 @@ const tertiaryValue = (
     tertiary.decimals === undefined ? shown : round(shown, tertiary.decimals),
     main.hass.locale
   );
+  if (tertiary.show_unit === false) return formatted;
   const unit = tertiary.unit_of_measurement ?? stateObj.attributes.unit_of_measurement;
   if (!unit) return formatted;
   return `${formatted}${tertiary.unit_white_space === false ? "" : " "}${unit}`;
+};
+
+/** A user-supplied CSS colour, or "" if absent or not a single plain value (keeps inline styles intact). */
+const cssColor = (color?: string): string =>
+  color && !/[;{}<>]/.test(color) ? `color: ${color.trim()};` : "";
+
+/** Scales the metric's default size (30% of the icon height); ignored unless a positive number. */
+const fontScale = (scale?: number): string =>
+  typeof scale === "number" && scale > 0
+    ? `font-size: calc(var(--mdc-icon-size) * ${0.3 * scale});`
+    : "";
+
+/** Nudges the metric from the icon's centre; offsets are fractions of the icon height. */
+const offset = (x?: number, y?: number): string => {
+  const dx = typeof x === "number" && Number.isFinite(x) ? x : 0;
+  const dy = typeof y === "number" && Number.isFinite(y) ? y : 0;
+  if (dx === 0 && dy === 0) return "";
+  return `transform: translate(calc(var(--mdc-icon-size) * ${dx}), calc(var(--mdc-icon-size) * ${dy}));`;
 };
 
 const tertiarySpan = (
@@ -66,6 +88,9 @@ const tertiarySpan = (
   // Stop propagation so tapping the metric opens its own entity, not the bubble's.
   return html`<span
     class="tertiary-info"
+    style=${cssColor(tertiary.color) +
+    fontScale(tertiary.font_scale) +
+    offset(tertiary.offset_x, tertiary.offset_y)}
     @click=${(e: MouseEvent) => {
       e.stopPropagation();
       main.onEntityClick(e, actions, entityId);
@@ -92,6 +117,19 @@ const tertiarySpan = (
   >`;
 };
 
+/** Parses "minX minY width height"; returns undefined for a missing or malformed value. */
+const parseViewBox = (viewBox?: string): { value: string; aspect: number } | undefined => {
+  if (!viewBox) return undefined;
+  const parts = viewBox
+    .trim()
+    .split(/[\s,]+/)
+    .map(Number);
+  if (parts.length !== 4 || parts.some((n) => !Number.isFinite(n))) return undefined;
+  const [, , width, height] = parts as [number, number, number, number];
+  if (width <= 0 || height <= 0) return undefined;
+  return { value: parts.join(" "), aspect: width / height };
+};
+
 /**
  * Renders a bubble's icon: an SVG path (`icon_path`) when configured, otherwise the HA icon,
  * with an optional `tertiary_info` metric centred over it. With neither option set the
@@ -106,11 +144,39 @@ export const bubbleIcon = ({
   allowIconPath = true,
 }: BubbleIconOptions): TemplateResult | typeof nothing => {
   const iconPath = allowIconPath ? fieldConfig?.icon_path : undefined;
-  const iconEl = iconPath
-    ? html`<ha-svg-icon id=${id} class="bubble-icon" .path=${iconPath}></ha-svg-icon>`
-    : icon !== " "
-      ? html`<ha-icon id=${id} .icon=${icon}></ha-icon>`
-      : nothing;
+  const viewBox = iconPath ? parseViewBox(fieldConfig?.icon_viewbox) : undefined;
+  const stroke = fieldConfig?.icon_stroke;
+  const color = cssColor(fieldConfig?.icon_color);
+  const iconEl = !iconPath
+    ? icon !== " "
+      ? html`<ha-icon id=${id} .icon=${icon} style=${color}></ha-icon>`
+      : nothing
+    : stroke && stroke > 0
+      ? // ha-svg-icon only fills, so outline icons are drawn as our own stroked SVG.
+        html`<svg
+          id=${id}
+          class="bubble-icon"
+          viewBox=${viewBox?.value ?? "0 0 24 24"}
+          style="height: var(--mdc-icon-size); width: calc(var(--mdc-icon-size) * ${viewBox?.aspect ??
+          1}); ${color}"
+        >
+          <path
+            d=${iconPath}
+            fill="none"
+            stroke="currentColor"
+            stroke-width=${stroke}
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          ></path>
+        </svg>`
+      : html`<ha-svg-icon
+          id=${id}
+          class="bubble-icon"
+          .path=${iconPath}
+          .viewBox=${viewBox?.value}
+          style=${(viewBox ? `width: calc(var(--mdc-icon-size) * ${viewBox.aspect}); ` : "") +
+          color}
+        ></ha-svg-icon>`;
   const tertiary = tertiarySpan(main, fieldConfig, tertiaryTemplate);
 
   if (tertiary === nothing) return iconEl;

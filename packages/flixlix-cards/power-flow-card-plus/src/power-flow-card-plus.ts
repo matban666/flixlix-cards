@@ -1142,7 +1142,8 @@ export class PowerFlowCardPlus extends LitElement {
       const sub = subscribeRenderTemplate(
         this.hass.connection,
         (result) => {
-          this._templateResults[topic] = result;
+          // Reassign so Lit sees the @state change; mutating in place doesn't re-render.
+          this._templateResults = { ...this._templateResults, [topic]: result };
         },
         {
           template: inputTemplate,

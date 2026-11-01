@@ -86,7 +86,7 @@ export const homeElement = (
           fieldConfig: entities.home,
           tertiaryTemplate: templatesObj.tertiary?.[tertiaryTemplateKey("home")],
         })}
-        ${homeUsageToDisplay}
+        <span class="home-value">${homeUsageToDisplay}</span>
         <svg class="home-circle-sections">
           ${homeSolarCircumference !== undefined
             ? svg`<circle
