@@ -80,18 +80,30 @@ const tertiarySpan = (
   const value = template || tertiaryValue(main, tertiary);
   if (!value) return nothing;
 
+  const style =
+    cssColor(tertiary.color) +
+    fontScale(tertiary.font_scale) +
+    offset(tertiary.offset_x, tertiary.offset_y);
+  const content = html`${tertiary.icon
+    ? html`<ha-icon class="small" .icon=${tertiary.icon}></ha-icon>`
+    : nothing}${value}`;
+
+  // The metric sits over the icon, so with no actions of its own a tap is a tap on the bubble:
+  // no handlers, the event bubbles to the circle and runs the bubble's tap_action.
+  if (!tertiary.tap_action && !tertiary.hold_action && !tertiary.double_tap_action) {
+    return html`<span class="pfcp-tertiary-info" style=${style}>${content}</span>`;
+  }
+
   const entityId = typeof tertiary.entity === "string" ? tertiary.entity : undefined;
   const actions = {
     tap_action: tertiary.tap_action,
     hold_action: tertiary.hold_action,
     double_tap_action: tertiary.double_tap_action,
   };
-  // Stop propagation so tapping the metric opens its own entity, not the bubble's.
+  // Own actions configured: stop propagation so the bubble's action doesn't also run.
   return html`<span
     class="pfcp-tertiary-info"
-    style=${cssColor(tertiary.color) +
-    fontScale(tertiary.font_scale) +
-    offset(tertiary.offset_x, tertiary.offset_y)}
+    style=${style}
     @click=${(e: MouseEvent) => {
       e.stopPropagation();
       main.onEntityClick(e, actions, entityId);
@@ -112,9 +124,7 @@ const tertiarySpan = (
       e.stopPropagation();
       main.onEntityPointerUp(e);
     }}
-    >${tertiary.icon
-      ? html`<ha-icon class="small" .icon=${tertiary.icon}></ha-icon>`
-      : nothing}${value}</span
+    >${content}</span
   >`;
 };
 
