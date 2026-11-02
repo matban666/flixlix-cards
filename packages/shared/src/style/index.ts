@@ -319,6 +319,21 @@ export const styles = css`
     margin-left: 0.3em;
     flex-shrink: 0;
   }
+  /* Extra metrics in the free bottom-left slot: the spacer's width, stretched to the row's
+     height and stacked from the bottom so the last reading lines up with the bottom-row labels
+     (padding-bottom lifts it from the label box bottom to its text bottom). */
+  .pfcp-extra-corner {
+    width: var(--size-circle-entity);
+    flex-shrink: 0;
+    align-self: stretch;
+    justify-content: flex-end;
+    padding-bottom: var(--pfcp-extra-corner-offset, 7px);
+    box-sizing: border-box;
+    overflow: visible;
+  }
+  .pfcp-extra-row {
+    margin-top: 8px;
+  }
   .card-content.no-labels .label {
     display: none;
   }

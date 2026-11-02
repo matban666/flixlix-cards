@@ -1,0 +1,27 @@
+# Demo outside readings and aurora activity for the showcase's extra metrics.
+input_number:
+  outside_temperature:
+    name: Outside temperature
+    min: -20
+    max: 40
+    step: 0.1
+    initial: 8.4
+    unit_of_measurement: "°C"
+    mode: slider
+  outside_humidity:
+    name: Outside humidity
+    min: 0
+    max: 100
+    step: 1
+    initial: 87
+    unit_of_measurement: "%"
+    mode: slider
+  aurora_value:
+    name: Aurora activity
+    min: 0
+    max: 500
+    step: 1
+    initial: 43
+    unit_of_measurement: nT
+    icon: mdi:aurora
+    mode: slider

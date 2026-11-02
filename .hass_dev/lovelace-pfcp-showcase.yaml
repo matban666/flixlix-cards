@@ -91,6 +91,16 @@ views:
                     color: black
                     offset_y: 0.03
                     decimals: 0
+            # Extra readings in the free bottom-left corner (or a bottom row if there is none).
+            extra_metrics:
+              - entity: input_number.outside_temperature
+                icon: mdi:thermometer
+                decimals: 1
+              - entity: input_number.outside_humidity
+                icon: mdi:water-percent
+              - entity: input_number.aurora_value
+                icon: mdi:aurora
+                decimals: 0
             clickable_entities: true
             display_zero_lines: true
       - type: grid

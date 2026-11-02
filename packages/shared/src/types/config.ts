@@ -9,6 +9,15 @@ import {
 
 export type DisplayZeroLinesMode = "show" | "grey_out" | "transparency" | "hide" | "custom";
 
+export type ExtraMetricConfig = {
+  entity: string;
+  /** Defaults to the entity's icon, then one for its device class. */
+  icon?: string;
+  /** Defaults to the entity's unit; "" hides it. */
+  unit?: string;
+  decimals?: number;
+};
+
 interface mainConfigOptions {
   dashboard_link?: string;
   dashboard_link_label?: string;
@@ -37,6 +46,10 @@ interface mainConfigOptions {
   };
   sort_individual_devices?: boolean;
   allow_layout_break?: boolean;
+  /** Small extra readings (icon, value, unit) shown in a free corner or a row at the bottom. */
+  extra_metrics?: ExtraMetricConfig[];
+  /** "auto" (default): free bottom-left corner when there's a bottom row, else a bottom row. */
+  extra_metrics_position?: "auto" | "bottom";
   /* LEGACY - JUST TO AVOID ERRORS */
   w_threshold?: number;
   w_decimals?: number;
