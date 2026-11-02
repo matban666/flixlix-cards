@@ -9,7 +9,13 @@ import { property } from "lit/decorators.js";
  * corner or in a single row along the bottom. Own shadow DOM, like the other pfcp elements.
  */
 
-export type ExtraMetric = { entity: string; icon: string; value: string; unit: string };
+export type ExtraMetric = {
+  entity: string;
+  icon: string;
+  value: string;
+  unit: string;
+  unitSpace: boolean;
+};
 
 const OFFLINE = new Set(["unknown", "unavailable", ""]);
 
@@ -55,6 +61,7 @@ export const extraMetricsData = (
           "mdi:information-outline",
         value,
         unit: OFFLINE.has(raw) ? "" : (item.unit ?? attrs.unit_of_measurement ?? ""),
+        unitSpace: item.unit_white_space !== false,
       };
     });
 
@@ -76,9 +83,11 @@ export class PfcpExtraMetrics extends LitElement {
       (m) =>
         html`<button class="metric" title=${m.entity} @click=${() => this._open(m.entity)}>
           <ha-icon .icon=${m.icon}></ha-icon>
-          <span class="value">${m.value}</span>${m.unit
-            ? html`<span class="unit">${m.unit}</span>`
-            : nothing}
+          <span class="reading"
+            ><span class="value">${m.value}</span>${m.unit
+              ? html`<span class="unit ${m.unitSpace ? "spaced" : ""}">${m.unit}</span>`
+              : nothing}</span
+          >
         </button>`
     )}`;
   }
@@ -123,7 +132,10 @@ export class PfcpExtraMetrics extends LitElement {
     .unit {
       color: var(--secondary-text-color);
       font-size: 0.85em;
-      margin-left: 1px;
+    }
+    /* A thin space, like the bubbles' unit_white_space default. */
+    .unit.spaced {
+      margin-left: 0.2em;
     }
   `;
 }

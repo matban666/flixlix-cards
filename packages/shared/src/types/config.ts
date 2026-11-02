@@ -16,6 +16,8 @@ export type ExtraMetricConfig = {
   /** Defaults to the entity's unit; "" hides it. */
   unit?: string;
   decimals?: number;
+  /** Set false to put the unit straight after the value ("8.4°C"). */
+  unit_white_space?: boolean;
 };
 
 interface mainConfigOptions {
