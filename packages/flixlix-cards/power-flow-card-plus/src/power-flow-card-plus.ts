@@ -9,6 +9,7 @@ import { alertBadges } from "@flixlix-cards/shared/components/misc/bubble-alert"
 import { tertiaryTemplateKey } from "@flixlix-cards/shared/components/misc/bubble-icon";
 import { dashboardLinkElement } from "@flixlix-cards/shared/components/misc/dashboard-link";
 import { nonFossilElement } from "@flixlix-cards/shared/components/non-fossil";
+import { extraMetricsData } from "@flixlix-cards/shared/components/pfcp/extra-metrics";
 import { flowLinesData } from "@flixlix-cards/shared/components/pfcp/flow-lines";
 import { solarElement } from "@flixlix-cards/shared/components/solar";
 import { spacer } from "@flixlix-cards/shared/components/spacer";
@@ -390,6 +391,13 @@ export class PowerFlowCardPlus extends LitElement {
       });
     };
 
+    const extraMetrics = extraMetricsData(this.hass, this._config.extra_metrics);
+    // A free bottom-left corner exists whenever the card has a bottom row (its first slot is a spacer).
+    const metricsInCorner =
+      extraMetrics.length > 0 &&
+      this._config.extra_metrics_position !== "bottom" &&
+      (battery.has || checkHasBottomIndividual(individualObjs));
+
     return html`
       <ha-card
         .header=${this._config.title}
@@ -474,7 +482,13 @@ export class PowerFlowCardPlus extends LitElement {
           </div>
           ${battery.has || checkHasBottomIndividual(individualObjs)
             ? html`<div class="row">
-                ${spacer}
+                ${metricsInCorner
+                  ? html`<pfcp-extra-metrics
+                      class="pfcp-extra-corner"
+                      layout="stack"
+                      .items=${extraMetrics}
+                    ></pfcp-extra-metrics>`
+                  : spacer}
                 ${battery.has
                   ? batteryElement(this, this._config, { battery, entities, templatesObj })
                   : spacer}
@@ -498,6 +512,13 @@ export class PowerFlowCardPlus extends LitElement {
                   : nothing}
               </div>`
             : spacer}
+          ${extraMetrics.length && !metricsInCorner
+            ? html`<pfcp-extra-metrics
+                class="pfcp-extra-row"
+                layout="row"
+                .items=${extraMetrics}
+              ></pfcp-extra-metrics>`
+            : nothing}
           <pfcp-flow-lines
             .lines=${flowLinesData(this._config, {
               battery,
